@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathe-Lernwerkstatt: Brüche & Dezimalzahlen</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX CSS & JS for LaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .math-font { font-family: 'Fira Code', monospace; }
+        
+        /* Grid styling for written math representation */
+        .math-grid {
+            display: inline-grid;
+            gap: 1px;
+            background-color: #cbd5e1;
+            padding: 1px;
+            border-radius: 0.375rem;
+        }
+        .math-cell {
+            background-color: #ffffff;
+            width: 2rem;
+            height: 2.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        .math-cell.highlight-comma {
+            background-color: #fef08a;
+            color: #854d0e;
+        }
+        .math-cell.subtraction {
+            color: #dc2626;
+        }
+        .math-cell.line-bottom {
+            border-bottom: 2px solid #1e293b;
+        }
+        .math-cell.line-double {
+            border-bottom: 3px double #1e293b;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-full flex flex-col justify-between">
+
+    <header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-indigo-500 rounded-lg text-2xl">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Mathe-Lernwerkstatt</h1>
+                    <p class="text-xs text-indigo-200">Grundrechenarten: Brüche & Dezimalzahlen</p>
+                </div>
+            </div>
+            
+            <!-- Global Score Badge -->
+            <div class="flex items-center gap-4 bg-indigo-700/60 backdrop-blur px-4 py-2 rounded-xl border border-indigo-400/30">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-300 text-lg"></i>
+                    <div>
+                        <div class="text-xs text-indigo-200 uppercase font-semibold">Punkte</div>
+                        <div id="score-display" class="text-lg font-bold">0</div>
+                    </div>
+                </div>
+                <div class="h-8 w-px bg-indigo-500/50"></div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-orange-400 text-lg"></i>
+                    <div>
+                        <div class="text-xs text-indigo-200 uppercase font-semibold">Streak</div>
+                        <div id="streak-display" class="text-lg font-bold">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-4 mb-8">
+            <button onclick="switchTab('mult-dec')" id="tab-mult-dec" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-indigo-600 text-white shadow-md">
+                <i class="fa-solid fa-xmark"></i> Multiplikation Dezimalzahlen
+            </button>
+            <button onclick="switchTab('div-dec')" id="tab-div-dec" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-divide"></i> Division Dezimalzahlen
+            </button>
+            <button onclick="switchTab('mult-frac')" id="tab-mult-frac" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-square-root-variable"></i> Multiplikation Brüche
+            </button>
+            <button onclick="switchTab('div-frac')" id="tab-div-frac" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-percent"></i> Division Brüche
+            </button>
+        </div>
+
+        <!-- Module 1: Multiplikation Dezimalzahlen -->
+        <section id="module-mult-dec" class="module-content space-y-8">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-4 text-indigo-600">
+                    <span class="px-3 py-1 bg-indigo-100 rounded-full text-xs font-bold uppercase tracking-wider">Anleitung & Fachbegriffe</span>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">Schriftliche Multiplikation von Dezimalzahlen</h2>
+                
+                <div class="bg-indigo-50/50 border-l-4 border-indigo-500 p-4 rounded-r-xl mb-6">
+                    <p class="font-semibold text-indigo-950">Fachbegriffe:</p>
+                    <p class="text-lg text-indigo-900 mt-1"><span class="font-bold">1. Faktor</span> &bull; <span class="font-bold">2. Faktor</span> = <span class="font-bold">Produkt</span></p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-start">
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <span class="w-7 h-7 bg-indigo-600 text-white rounded-full text-xs flex items-center justify-center font-bold">1</span>
+                            Schritt-für-Schritt Anleitung
+                        </h3>
+                        <ol class="space-y-3 text-slate-600 text-sm list-decimal list-inside">
+                            <li class="pl-1"><strong class="text-slate-800">Ohne Kommas rechnen:</strong> Zunächst schriftlich multiplizieren wie ganze Zahlen (Ziffern nebeneinander schreiben, Linie darunter).</li>
+                            <li class="pl-1"><strong class="text-slate-800">Stellenweise multiplizieren:</strong> Beginne beim größten Stellenwert des 2. Faktors mit allen Ziffern des 1. Faktors (Überträge beachten, leere Stellen rechts mit Null auffüllen).</li>
+                            <li class="pl-1"><strong class="text-slate-800">Nächste Stellen:</strong> Multipliziere mit den weiteren Stellenwerten des 2. Faktors.</li>
+                            <li class="pl-1"><strong class="text-slate-800">Teilergebnisse addieren:</strong> Ergebnisse addieren (Zeile für Überträge frei lassen).</li>
+                            <li class="pl-1 bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-amber-900">
+                                <strong class="text-amber-950"><i class="fa-solid fa-star text-amber-500 mr-1"></i> Dezimalzahlen-Spezifik:</strong> Zähle die Nachkommastellen beider Faktoren zusammen. Setze das Komma im Ergebnis von rechts nach links genau an diese Stelle.
+                            </li>
+                        </ol>
+                    </div>
+
+                    <!-- Visual Example Board -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs uppercase font-bold tracking-wider text-indigo-400">Schriftliches Verfahren</span>
+                            <span class="text-xs text-slate-400">Beispiel: <span class="font-mono text-amber-300">3,42 &bull; 1,5</span></span>
+                        </div>
+                        
+                        <div class="font-mono text-base space-y-1 bg-slate-800 p-4 rounded-xl border border-slate-700 overflow-x-auto">
+                            <div class="text-right tracking-widest text-indigo-200 border-b border-slate-600 pb-1 mb-2">
+                                3 , 4 2 &bull; 1 , 5
+                            </div>
+                            <div class="text-right tracking-widest">3 4 2 0</div>
+                            <div class="text-right tracking-widest text-slate-400">+ 1 7 1 0</div>
+                            <div class="border-t-2 border-white my-1"></div>
+                            <div class="text-right tracking-widest text-amber-400 font-bold text-lg">
+                                5 , 1 3 0
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-xs text-slate-300 space-y-1 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+                            <p class="text-amber-300 font-medium"><i class="fa-solid fa-calculator mr-1"></i> Kommasetzung:</p>
+                            <p>• 3,42 hat <span class="text-indigo-300 font-bold">2 Nachkommastellen</span></p>
+                            <p>• 1,5 hat <span class="text-indigo-300 font-bold">1 Nachkommastelle</span></p>
+                            <p>&rarr; Ergebnis hat <span class="text-amber-400 font-bold">2 + 1 = 3 Nachkommastellen</span> (von rechts gezählt: 5,130 = 5,13)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Interactive Section -->
+            <div id="practice-mult-dec" class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Interaktive Übungsaufgabe
+                    </h3>
+                    <button onclick="generateQuestion('mult-dec')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Neue Aufgabe
+                    </button>
+                </div>
+                <div id="exercise-mult-dec-container"></div>
+            </div>
+        </section>
+
+        <!-- Module 2: Division Dezimalzahlen -->
+        <section id="module-div-dec" class="module-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-4 text-indigo-600">
+                    <span class="px-3 py-1 bg-indigo-100 rounded-full text-xs font-bold uppercase tracking-wider">Anleitung & Fachbegriffe</span>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">Schriftliche Division von Dezimalzahlen</h2>
+                
+                <div class="bg-indigo-50/50 border-l-4 border-indigo-500 p-4 rounded-r-xl mb-6">
+                    <p class="font-semibold text-indigo-950">Fachbegriffe:</p>
+                    <p class="text-lg text-indigo-900 mt-1"><span class="font-bold">Dividend</span> : <span class="font-bold">Divisor</span> = <span class="font-bold">Quotient</span></p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-start">
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <span class="w-7 h-7 bg-indigo-600 text-white rounded-full text-xs flex items-center justify-center font-bold">2</span>
+                            Schritt-für-Schritt Anleitung
+                        </h3>
+                        <ol class="space-y-3 text-slate-600 text-sm list-decimal list-inside">
+                            <li class="pl-1 bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-amber-900">
+                                <strong class="text-amber-950">1. Kommaverschiebung:</strong> Falls der Divisor (2. Zahl) ein Komma hat, verschiebe das Komma bei Dividend und Divisor um gleich viele Stellen nach rechts, bis der Divisor eine ganze Zahl ist.
+                            </li>
+                            <li class="pl-1"><strong class="text-slate-800">2. Stelle für Stelle teilen:</strong> Wie oft passt der Divisor in die erste Ziffer/Zahl? Ergebnis notieren, multiplizieren, subtrahieren und Rest anschreiben.</li>
+                            <li class="pl-1"><strong class="text-slate-800">3. Ziffer herunterziehen:</strong> Nächste Ziffer herunterziehen und weiterdividieren.</li>
+                            <li class="pl-1"><strong class="text-slate-800">4. Komma im Ergebnis setzen:</strong> Sobald du das Komma im Dividenden überschreitest (oder beim Herunterziehen der ersten Nachkommastelle), setzt du sofort ein Komma im Ergebnis!</li>
+                        </ol>
+                    </div>
+
+                    <!-- Visual Division Example Board -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-inner">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs uppercase font-bold tracking-wider text-indigo-400">Klassisches Schriftliches Verfahren</span>
+                            <span class="text-xs text-slate-400">Beispiel: <span class="font-mono text-amber-300">12,78 : 6</span></span>
+                        </div>
+                        
+                        <div class="font-mono text-sm bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-1 overflow-x-auto">
+                            <div class="text-amber-300 font-bold text-base border-b border-slate-700 pb-1 mb-2">
+                                1 2 , 7 8 : 6 = <span class="text-emerald-400">2 , 1 3</span>
+                            </div>
+                            <div class="text-rose-400">-1 2</div>
+                            <div class="border-t border-slate-600 w-12"></div>
+                            <div>&nbsp;&nbsp;0 7 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-xs text-indigo-300">&larr; (7 herunterziehen, Komma überschritten!)</span></div>
+                            <div class="text-rose-400">&nbsp;- 6</div>
+                            <div class="border-t border-slate-600 w-12"></div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;1 8 &nbsp;&nbsp;&nbsp;<span class="text-xs text-indigo-300">&larr; (8 herunterziehen)</span></div>
+                            <div class="text-rose-400">&nbsp;&nbsp;-1 8</div>
+                            <div class="border-t border-slate-600 w-12"></div>
+                            <div class="text-emerald-400 font-bold">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 &nbsp;&nbsp;&nbsp;<span class="text-xs text-slate-400">&larr; (Rest 0, Fertig!)</span></div>
+                        </div>
+
+                        <div class="mt-4 text-xs text-slate-300 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+                            <p class="text-amber-300 font-medium mb-1"><i class="fa-solid fa-right-long mr-1"></i> Hinweis zur Kommaverschiebung:</p>
+                            <p class="font-mono text-slate-200">1,278 : 0,6 &rarr; Komma 1 Stelle nach rechts &rarr; 12,78 : 6 = 2,13</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Interactive Section -->
+            <div id="practice-div-dec" class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Interaktive Übungsaufgabe
+                    </h3>
+                    <button onclick="generateQuestion('div-dec')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Neue Aufgabe
+                    </button>
+                </div>
+                <div id="exercise-div-dec-container"></div>
+            </div>
+        </section>
+
+        <!-- Module 3: Multiplikation Brüche -->
+        <section id="module-mult-frac" class="module-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-4 text-indigo-600">
+                    <span class="px-3 py-1 bg-indigo-100 rounded-full text-xs font-bold uppercase tracking-wider">Regel & Formel</span>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">Multiplikation von Brüchen</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-4">
+                        <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-xl">
+                            <p class="font-bold text-indigo-950 text-lg">Grundregel:</p>
+                            <p class="text-indigo-900 text-base mt-1">
+                                <span class="font-bold text-indigo-600">Zähler mal Zähler</span> und <span class="font-bold text-indigo-600">Nenner mal Nenner</span>.
+                            </p>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Zwei Brüche werden multipliziert, indem man den Zähler des ersten Bruchs mit dem Zähler des zweiten Bruchs multipliziert und den Nenner des ersten Bruchs mit dem Nenner des zweiten Bruchs. Vor dem Ausmultiplizieren sollte man nach Möglichkeit über Kreuz kürzen!
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl text-center space-y-4">
+                        <span class="text-xs uppercase font-bold tracking-wider text-indigo-400">Mathematische Darstellung</span>
+                        <div id="katex-mult-formula" class="text-2xl py-2"></div>
+                        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-left text-xs space-y-1">
+                            <p class="text-amber-300 font-bold"><i class="fa-solid fa-book-open mr-1"></i> Rechenbeispiel:</p>
+                            <div id="katex-mult-example" class="py-1 text-center text-sm"></div>
+                            <div id="katex-mult-note" class="text-slate-400 text-center"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Interactive Section -->
+            <div id="practice-mult-frac" class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Interaktive Übungsaufgabe
+                    </h3>
+                    <button onclick="generateQuestion('mult-frac')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Neue Aufgabe
+                    </button>
+                </div>
+                <div id="exercise-mult-frac-container"></div>
+            </div>
+        </section>
+
+        <!-- Module 4: Division Brüche -->
+        <section id="module-div-frac" class="module-content hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-4 text-indigo-600">
+                    <span class="px-3 py-1 bg-indigo-100 rounded-full text-xs font-bold uppercase tracking-wider">Regel & Formel</span>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">Division von Brüchen</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-4">
+                        <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-xl">
+                            <p class="font-bold text-indigo-950 text-lg">Grundregel:</p>
+                            <p class="text-indigo-900 text-base mt-1">
+                                Man dividiert durch einen Bruch, indem man mit seinem <span class="font-bold text-indigo-600">Kehrwert multipliziert</span>.
+                            </p>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Der Kehrwert entsteht, indem Zähler und Nenner des zweiten Bruchs (Divisor) vertauscht werden. Danach wird wie gewohnt "Zähler mal Zähler" und "Nenner mal Nenner" gerechnet.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl text-center space-y-4">
+                        <span class="text-xs uppercase font-bold tracking-wider text-indigo-400">Mathematische Darstellung</span>
+                        <div id="katex-div-formula" class="text-2xl py-2"></div>
+                        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-left text-xs space-y-1">
+                            <p class="text-amber-300 font-bold"><i class="fa-solid fa-book-open mr-1"></i> Rechenbeispiel:</p>
+                            <div id="katex-div-example" class="py-1 text-center text-sm"></div>
+                            <div id="katex-div-note" class="text-slate-400 text-center"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Interactive Section -->
+            <div id="practice-div-frac" class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Interaktive Übungsaufgabe
+                    </h3>
+                    <button onclick="generateQuestion('div-frac')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Neue Aufgabe
+                    </button>
+                </div>
+                <div id="exercise-div-frac-container"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+        <p>Mathe-Lernwerkstatt &bull; Erstellt für verständlichen & interaktiven Mathematikunterricht</p>
+    </footer>
+
+    <script>
+        // State management
+        let state = {
+            score: 0,
+            streak: 0,
+            activeTab: 'mult-dec',
+            currentQuestions: {}
+        };
+
+        // Utility: Greatest Common Divisor
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                let t = b;
+                b = a % b;
+                a = t;
+            }
+            return a;
+        }
+
+        // Initialize KaTeX formulas
+        window.onload = function() {
+            katex.render("\\frac{a}{b} \\cdot \\frac{c}{d} = \\frac{a \\cdot c}{b \\cdot d}", document.getElementById('katex-mult-formula'), { throwOnError: false });
+            katex.render("\\frac{3}{4} \\cdot \\frac{2}{5} = \\frac{3 \\cdot 2}{4 \\cdot 5} = \\frac{6}{20} = \\frac{3}{10}", document.getElementById('katex-mult-example'), { throwOnError: false });
+            katex.render("(\\text{Hier wurde } \\frac{6}{20} \\text{ mit 2 gekürzt zu } \\frac{3}{10})", document.getElementById('katex-mult-note'), { throwOnError: false });
+
+            katex.render("\\frac{a}{b} : \\frac{c}{d} = \\frac{a}{b} \\cdot \\frac{d}{c} = \\frac{a \\cdot d}{b \\cdot c}", document.getElementById('katex-div-formula'), { throwOnError: false });
+            katex.render("\\frac{3}{4} : \\frac{2}{5} = \\frac{3}{4} \\cdot \\frac{5}{2} = \\frac{3 \\cdot 5}{4 \\cdot 2} = \\frac{15}{8}", document.getElementById('katex-div-example'), { throwOnError: false });
+            katex.render("(\\text{Wichtig: Nur der 2. Bruch } \\frac{2}{5} \\text{ wird zum Kehrwert } \\frac{5}{2} \\text{ umgekehrt!})", document.getElementById('katex-div-note'), { throwOnError: false });
+
+            // Generate initial questions
+            ['mult-dec', 'div-dec', 'mult-frac', 'div-frac'].forEach(type => generateQuestion(type));
+        };
+
+        // Switch Tabs
+        function switchTab(tabId) {
+            state.activeTab = tabId;
+            document.querySelectorAll('.module-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`module-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100";
+            });
+            
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.className = "tab-btn px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 bg-indigo-600 text-white shadow-md";
+        }
+
+        // Update Score and UI
+        function updateScore(points) {
+            if (points > 0) {
+                state.score += points;
+                state.streak += 1;
+            } else {
+                state.streak = 0;
+            }
+            document.getElementById('score-display').innerText = state.score;
+            document.getElementById('streak-display').innerText = state.streak;
+        }
+
+        function generateQuestion(type) {
+            const container = document.getElementById(`exercise-${type}-container`);
+            container.innerHTML = ''; // Clear container
+
+            if (type === 'mult-dec') {
+                const num1 = (Math.floor(Math.random() * 89 + 10) / 10).toFixed(1);
+                const num2 = (Math.floor(Math.random() * 89 + 10) / 10).toFixed(1);
+                const ans = (parseFloat(num1) * parseFloat(num2)).toFixed(2);
+
+                state.currentQuestions[type] = { num1, num2, ans };
+
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 text-center">
+                            <p class="text-sm text-slate-500 font-medium mb-1">Berechne schriftlich das Produkt:</p>
+                            <p class="text-3xl font-bold font-mono text-slate-800">${num1.replace('.', ',')} &bull; ${num2.replace('.', ',')}</p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <input type="text" id="input-mult-dec" placeholder="Ergebnis eingeben (z.B. 3.45 oder 3,45)" 
+                                class="w-full sm:w-80 px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-center text-lg font-mono">
+                            <button onclick="checkAnswer('mult-dec')" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition shadow">
+                                Überprüfen
+                            </button>
+                        </div>
+
+                        <div id="feedback-mult-dec" class="hidden rounded-xl p-4 text-sm font-medium"></div>
+
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <button onclick="toggleHint('hint-mult-dec')" class="w-full bg-slate-100 hover:bg-slate-200 p-3 text-left font-semibold text-slate-700 text-sm flex justify-between items-center">
+                                <span><i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i>Schritt-für-Schritt Lösungsweg anzeigen</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400"></i>
+                            </button>
+                            <div id="hint-mult-dec" class="hidden p-4 bg-white space-y-3 text-xs text-slate-600 border-t border-slate-200">
+                                <p><strong>Schritt 1:</strong> Ohne Kommas multiplizieren: <span class="font-mono font-bold">${num1.replace('.', '')} &bull; ${num2.replace('.', '')} = ${(parseFloat(num1.replace('.', '')) * parseFloat(num2.replace('.', '')))}</span></p>
+                                <p><strong>Schritt 2:</strong> Zähle die Nachkommastellen:</p>
+                                <ul class="list-disc list-inside pl-2 space-y-1">
+                                    <li>${num1.replace('.', ',')} hat 1 Nachkommastelle</li>
+                                    <li>${num2.replace('.', ',')} hat 1 Nachkommastelle</li>
+                                    <li>&rarr; Zusammen: <strong>2 Nachkommastellen</strong></li>
+                                </ul>
+                                <p><strong>Schritt 3:</strong> Komma von rechts setzen &rarr; <span class="font-mono font-bold text-indigo-600">${ans.replace('.', ',')}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } 
+            else if (type === 'div-dec') {
+                const divisor = (Math.floor(Math.random() * 8 + 2) / 10).toFixed(1);
+                const quotTemp = (Math.floor(Math.random() * 89 + 11) / 10);
+                const dividend = (quotTemp * parseFloat(divisor)).toFixed(2);
+                const ans = quotTemp.toFixed(1);
+
+                state.currentQuestions[type] = { dividend, divisor, ans };
+
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 text-center">
+                            <p class="text-sm text-slate-500 font-medium mb-1">Berechne schriftlich den Quotienten:</p>
+                            <p class="text-3xl font-bold font-mono text-slate-800">${dividend.replace('.', ',')} : ${divisor.replace('.', ',')}</p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <input type="text" id="input-div-dec" placeholder="Ergebnis eingeben (z.B. 2,4)" 
+                                class="w-full sm:w-80 px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-center text-lg font-mono">
+                            <button onclick="checkAnswer('div-dec')" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition shadow">
+                                Überprüfen
+                            </button>
+                        </div>
+
+                        <div id="feedback-div-dec" class="hidden rounded-xl p-4 text-sm font-medium"></div>
+
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <button onclick="toggleHint('hint-div-dec')" class="w-full bg-slate-100 hover:bg-slate-200 p-3 text-left font-semibold text-slate-700 text-sm flex justify-between items-center">
+                                <span><i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i>Schritt-für-Schritt Lösungsweg anzeigen</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400"></i>
+                            </button>
+                            <div id="hint-div-dec" class="hidden p-4 bg-white space-y-3 text-xs text-slate-600 border-t border-slate-200">
+                                <p><strong>Schritt 1 (Kommaverschiebung):</strong> Verschiebe das Komma um 1 Stelle nach rechts, damit der Divisor eine ganze Zahl ist:</p>
+                                <p class="font-mono bg-slate-100 p-2 rounded text-indigo-700 font-bold">${(parseFloat(dividend)*10).toFixed(1).replace('.', ',')} : ${(parseFloat(divisor)*10).toFixed(0)}</p>
+                                <p><strong>Schritt 2:</strong> Führe die gewohnte schriftliche Division durch.</p>
+                                <p><strong>Schritt 3:</strong> Setze im Ergebnis sofort das Komma, sobald du die erste Nachkommastelle herunterziehst!</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (type === 'mult-frac') {
+                const z1 = Math.floor(Math.random() * 5 + 1);
+                const n1 = Math.floor(Math.random() * 5 + 2);
+                const z2 = Math.floor(Math.random() * 5 + 1);
+                const n2 = Math.floor(Math.random() * 5 + 2);
+
+                const rawZ = z1 * z2;
+                const rawN = n1 * n2;
+                const g = gcd(rawZ, rawN);
+                const simpZ = rawZ / g;
+                const simpN = rawN / g;
+
+                state.currentQuestions[type] = { z1, n1, z2, n2, simpZ, simpN };
+
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex justify-center items-center gap-4">
+                            <div id="frac-display-mult" class="text-2xl"></div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="input-mult-frac-z" placeholder="Zähler" class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-center font-bold">
+                                <span class="text-xl font-bold">/</span>
+                                <input type="number" id="input-mult-frac-n" placeholder="Nenner" class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-center font-bold">
+                            </div>
+                            <button onclick="checkAnswer('mult-frac')" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition shadow">
+                                Überprüfen
+                            </button>
+                        </div>
+
+                        <div id="feedback-mult-frac" class="hidden rounded-xl p-4 text-sm font-medium"></div>
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    katex.render(`\\frac{${z1}}{${n1}} \\cdot \\frac{${z2}}{${n2}} = ?`, document.getElementById('frac-display-mult'), { throwOnError: false });
+                }, 50);
+            }
+            else if (type === 'div-frac') {
+                const z1 = Math.floor(Math.random() * 5 + 1);
+                const n1 = Math.floor(Math.random() * 5 + 2);
+                const z2 = Math.floor(Math.random() * 5 + 1);
+                const n2 = Math.floor(Math.random() * 5 + 2);
+
+                const rawZ = z1 * n2;
+                const rawN = n1 * z2;
+                const g = gcd(rawZ, rawN);
+                const simpZ = rawZ / g;
+                const simpN = rawN / g;
+
+                state.currentQuestions[type] = { z1, n1, z2, n2, simpZ, simpN };
+
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex justify-center items-center gap-4">
+                            <div id="frac-display-div" class="text-2xl"></div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="input-div-frac-z" placeholder="Zähler" class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-center font-bold">
+                                <span class="text-xl font-bold">/</span>
+                                <input type="number" id="input-div-frac-n" placeholder="Nenner" class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-center font-bold">
+                            </div>
+                            <button onclick="checkAnswer('div-frac')" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition shadow">
+                                Überprüfen
+                            </button>
+                        </div>
+
+                        <div id="feedback-div-frac" class="hidden rounded-xl p-4 text-sm font-medium"></div>
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    katex.render(`\\frac{${z1}}{${n1}} : \\frac{${z2}}{${n2}} = ?`, document.getElementById('frac-display-div'), { throwOnError: false });
+                }, 50);
+            }
+        }
+
+        function checkAnswer(type) {
+            const feedback = document.getElementById(`feedback-${type}`);
+            feedback.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+            let isCorrect = false;
+            const q = state.currentQuestions[type];
+
+            if (type === 'mult-dec' || type === 'div-dec') {
+                const inputVal = document.getElementById(`input-${type}`).value.replace(',', '.').trim();
+                if (Math.abs(parseFloat(inputVal) - parseFloat(q.ans)) < 0.01) {
+                    isCorrect = true;
+                }
+            } else if (type === 'mult-frac' || type === 'div-frac') {
+                const inputZ = parseInt(document.getElementById(`input-${type}-z`).value);
+                const inputN = parseInt(document.getElementById(`input-${type}-n`).value);
+
+                if (inputZ && inputN) {
+                    const g = gcd(inputZ, inputN);
+                    if ((inputZ / g === q.simpZ) && (inputN / g === q.simpN)) {
+                        isCorrect = true;
+                    }
+                }
+            }
+
+            if (isCorrect) {
+                feedback.classList.add('bg-emerald-100', 'text-emerald-800');
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i><strong>Hervorragend!</strong> Das Ergebnis ist vollkommen richtig. (+10 Punkte)`;
+                updateScore(10);
+            } else {
+                feedback.classList.add('bg-rose-100', 'text-rose-800');
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-2"></i><strong>Noch nicht ganz:</strong> Überprüfe deine Rechnung oder nutze den Lösungsweg.`;
+                updateScore(0);
+            }
+        }
+
+        function toggleHint(hintId) {
+            const hint = document.getElementById(hintId);
+            hint.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
